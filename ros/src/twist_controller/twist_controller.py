@@ -1,3 +1,7 @@
+from pid import PID
+import rospy
+from lowpass import LowPassFilter
+from yaw_controller import YawController
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
@@ -6,9 +10,9 @@ ONE_MPH = 0.44704
 class Controller(object):
     def __init__(self, vehicle_mass, brake_deadband, decel_limit, accel_limit, wheel_radius, wheel_base, steer_ratio, max_lat_accel, max_steer_angle):
 
-        Kp = 0.3 # Need to tune
-        Ki = 0.1
-        Kd = 0.0
+        kp = 0.3 # Need to tune
+        ki = 0.1
+        kd = 0.0
 
         mn = 0.0 # minimum throttle
         mx = 0.2 # maximum throttle
@@ -26,7 +30,7 @@ class Controller(object):
         self.accel_limit = accel_limit
         self.wheel_radius = wheel_radius
 
-        self.last_time - rospy.get_time()
+        self.last_time = rospy.get_time()
 
     def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
         if not dbw_enabled:

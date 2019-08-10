@@ -155,7 +155,7 @@ class TLDetector(object):
                 line = stop_line_positions[i]
                 temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
                 # Find closest stop line waypoint idx
-                d = temp_wp_idx - 
+                d = temp_wp_idx - car_wp_idx
                 # linear check to find the closest
                 if d >= 0 and d < diff:
                     diff = d
