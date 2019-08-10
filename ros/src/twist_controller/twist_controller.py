@@ -5,8 +5,8 @@ ONE_MPH = 0.44704
 
 class Controller(object):
     def __init__(self, vehicle_mass, brake_deadband, decel_limit, accel_limit, wheel_radius, wheel_base, steer_ratio, max_lat_accel, max_steer_angle):
-        # TODO: Implement
-        Kp = 0.3
+
+        Kp = 0.3 # Need to tune
         Ki = 0.1
         Kd = 0.0
 
@@ -29,11 +29,9 @@ class Controller(object):
         self.last_time - rospy.get_time()
 
     def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
-        # TODO: Change the arg, kwarg list to suit your needs
-        # Return throttle, brake, steer
         if not dbw_enabled:
             self.throttle_controller.reset()
-            return 0.0, 0.0, 0.0
+            return 0.0, 0.0, 0.0  # Return throttle, brake, steer
 
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
@@ -46,11 +44,11 @@ class Controller(object):
         self.last_time = current_time
 
         throttle = self.throttle_controller.step(vel_error, sample_time)
-        brake = 0
+        brake = 0.0
 
-        if linear_vel == 0.0 and current_vel < 0.1:
+        if linear_vel == 0.0 and current_vel < 0.1: # todo: jerk-minimizing brake application
             throttle = 0.0
-            brake = 400 #Nm
+            brake = 400.0 #N.m
         elif throttle < 0.1 and vel_error < 0:
             throttle = 0.0
             decel = max(vel_error, self.decel_limit)
