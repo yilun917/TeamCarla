@@ -73,7 +73,7 @@ class WaypointUpdater(object):
 
         # Equation for hyperplane through closest_coords
         cl_vect = np.array(closest_coord)
-        prev_vec = np.array(prev_coord)
+        prev_vect = np.array(prev_coord)
         pos_vect = np.array([x, y])
 
         val = np.dot(cl_vect - prev_vect, pos_vect -  cl_vect)
