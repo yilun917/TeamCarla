@@ -38,7 +38,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/traffic_waypoint', Int32, self.waypoints_cb)
         # TODO add the obstacle_cb callback function
         #rospy.Subscriber('/obstacle_waypoint', Int32, self.obstacle_cb)
-        
+
         # publishes the final waypoitns to the controller to execute
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
@@ -51,7 +51,7 @@ class WaypointUpdater(object):
         self.stopline_wp_idx = -1
 
         self.loop()
-    
+
     # run the program in a loop with specified rate
     def loop(self):
         rate = rospy.Rate(50)
@@ -65,7 +65,7 @@ class WaypointUpdater(object):
     def get_closest_waypoint_idx(self):
         x = self.pose.pose.position.x
         y = self.pose.pose.position.y
-        closest_idx = self.waypoint_tree.quart([x, y], 1)[1]
+        closest_idx = self.waypoint_tree.query([x, y], 1)[1]
 
         # Check if closest is ahead or behind vehicle
         closest_coord = self.waypoints_2d[closest_idx]
@@ -109,7 +109,7 @@ class WaypointUpdater(object):
             lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
 
         return lane
- 
+
     def decelerate_waypoints(self, waypoints, closest_idx):
         # avoid the modification of base_lane, since it only passes in once
         temp = []
@@ -117,7 +117,7 @@ class WaypointUpdater(object):
 
             p = Waypoint()
             p.pose = wp.pose
-            
+
             # 2 waypoints back from line so front of car stops at line
             stop_idx = max(self.stopline_wp_idx - closest_idx - 3, 0)
             dist = self.distance(waypoints, i, stop_idx)
