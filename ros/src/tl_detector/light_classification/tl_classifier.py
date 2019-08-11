@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import rospy
 import tensorflow as tf
 import cv2
 import random
@@ -58,7 +59,7 @@ class TLClassifier(object):
         labels = []
         
         if len(lights) == 0:
-            print("tl_classifier::No lights found")
+            rospy.loginfo("tl_classifier::No lights found")
             return TrafficLight.UNKNOWN
         
         # Loop through the traffic light detections and add the detected colors to the llabels list
@@ -73,16 +74,16 @@ class TLClassifier(object):
                 
         # Look through the list and return the most dangerous color found
         if 0 in labels:  # RED
-            print("tl_classifier::Red light found")
+            rospy.loginfo("tl_classifier::Red light found")
             return TrafficLight.RED
         elif 1 in labels: # YELLOW
-            print("tl_classifier::Yellow light found")
+            rospy.loginfo("tl_classifier::Yellow light found")
             return TrafficLight.YELLOW
         elif 2 in labels: # GREEN
-            print("tl_classifier::Green light found")
+            rospy.loginfo("tl_classifier::Green light found")
             return TrafficLight.GREEN
         
-        print("tl_classifier::Light found - COLOR UNDETERMINED")
+        rospy.loginfo("tl_classifier::Light found - COLOR UNDETERMINED")
         return TrafficLight.UNKNOWN
 
 
