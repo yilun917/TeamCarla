@@ -49,13 +49,21 @@ class TLClassifier(object):
         crop_img = image.copy()
         h = crop_img.shape[0]
         w = crop_img.shape[1]  
-        y = 0             # Adjust top start
+
+        # High center image
+        #y = 0             # Adjust top start
+        #x = int(h * 0.25) # Adjust side to side start
+        #h = int(h * 0.80) # Adjust window height
+        #w = int(w * 0.55) # Adjust window width
+
+        # Low center image
+        y = int(h * 0.40)  # Adjust top start
         x = int(h * 0.25) # Adjust side to side start
-        h = int(h * 0.80) # Adjust window height
-        w = int(w * 0.55) # Adjust window width
-        crop_img = image[y: y + h, x: x + w].copy()      
-        
-        lights = self.find_objects(image, confidence_cutoff, detect_types)
+        h = int(h * 0.90) # Adjust window height
+        w = int(w * 0.65) # Adjust window width
+
+        crop_img = image[y: y + h, x: x + w].copy()
+        lights = self.find_objects(crop_img, confidence_cutoff, detect_types)
         labels = []
         
         if len(lights) == 0:
