@@ -160,22 +160,22 @@ class TLDetector(object):
             car_wp_idx = self.get_closest_waypoint(x, y)
 
             #TODO find the closest visible traffic light (if one exists)
-            diff = len(self.waypoints.waypoints)
+        diff = len(self.waypoints.waypoints)
             # iterate through the traffic lights to find the closest
-            for i, light in enumerate(self.lights):
-                # Get stop line waypoint index
-                line = stop_line_positions[i]
-                temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
-                # Find closest stop line waypoint idx
-                d = temp_wp_idx - car_wp_idx
-                # linear check to find the closest
-                if d >= 0 and d < diff:
-                    diff = d
-                    closest_light = light
-                    line_wp_idx = temp_wp_idx
+        for i, light in enumerate(self.lights):
+            # Get stop line waypoint index
+            line = stop_line_positions[i]
+            temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
+            # Find closest stop line waypoint idx
+            d = temp_wp_idx - car_wp_idx
+            # linear check to find the closest
+            if d >= 0 and d < diff:
+                diff = d
+                closest_light = light
+                line_wp_idx = temp_wp_idx
 
         if closest_light:
-            state = self.get_light_state(light)
+            state = self.get_light_state(closest_light)
             return line_wp_idx, state
 
         return -1, TrafficLight.UNKNOWN
