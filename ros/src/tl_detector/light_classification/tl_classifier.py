@@ -57,7 +57,7 @@ class TLClassifier(object):
         #w = int(w * 0.55) # Adjust window width
 
         # Low center image
-        y = int(h * 0.40)  # Adjust top start
+        y = int(h * 0.30)  # Adjust top start
         x = int(h * 0.25) # Adjust side to side start
         h = int(h * 0.90) # Adjust window height
         w = int(w * 0.65) # Adjust window width
