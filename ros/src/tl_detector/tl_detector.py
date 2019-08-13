@@ -124,8 +124,9 @@ class TLDetector(object):
 
         """
         # just for testing
-        # return light.state
-
+        print(light.state)
+        return light.state
+        """
         if(not self.has_image):
             self.prev_light_loc = None
             return False
@@ -139,7 +140,7 @@ class TLDetector(object):
             return self.last_light_state
         else :
             return self.last_light_state
-
+        """
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
             location and color
