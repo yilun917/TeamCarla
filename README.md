@@ -6,9 +6,9 @@ Please use **one** of the two installation options, either native **or** docker 
 
 ### Team Member
 Yilun Yu (yilunyu@usc.edu)
-Greg Laughlin (gregoryjlaughlin@gmail.com)
-Mohammed Nasir (mnehaal@gmail.com)
-Juan Xu (juan.xu07@outlook.com)
+<br />Greg Laughlin (gregoryjlaughlin@gmail.com)
+<br />Mohammed Nasir (mnehaal@gmail.com)
+<br />Juan Xu (juan.xu07@outlook.com)
 
 ### Native Installation
 
