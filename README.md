@@ -4,10 +4,10 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 ### Team Members
 
-####Team Lead:
-<br />Yilun Yu (yilunyu@usc.edu)
-####Team Member:
-<br />Greg Laughlin (gregoryjlaughlin@gmail.com)
+#### Team Lead:
+Yilun Yu (yilunyu@usc.edu)
+#### Team Member:
+Greg Laughlin (gregoryjlaughlin@gmail.com)
 <br />Mohammed Nasir (mnehaal@gmail.com)
 <br />Juan Xu (juan.xu07@outlook.com)
 
