@@ -38,7 +38,7 @@ class TLDetector(object):
         rely on the position of the light and the camera image to predict it.
         '''
         sub3 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
-        sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
+        sub6 = rospy.Subscriber('/image_color', Image, self.image_cb, queue_size=1)
 
         config_string = rospy.get_param("/traffic_light_config")
         # config also contains an "is_site" bool variable to check if the car is running in simulator or site
@@ -121,10 +121,14 @@ class TLDetector(object):
 
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
-
+        UNKNOWN=4
+        GREEN=2
+        YELLOW=1
+        RED=0
         """
+        disct = {0: "RED", 1: "YELLOW", 2: "GREEN", 4:"UNKNOWN"}
         # just for testing
-        print(light.state)
+        print(disct[light.state])
         return light.state
         """
         if(not self.has_image):

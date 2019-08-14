@@ -119,11 +119,11 @@ class WaypointUpdater(object):
             p.pose = wp.pose
 
             # 2 waypoints back from line so front of car stops at line
-            stop_idx = max(self.stopline_wp_idx - closest_idx - 3, 0)
+            stop_idx = max(self.stopline_wp_idx - closest_idx - 2, 0)
             dist = self.distance(waypoints, i, stop_idx)
             # TODO: could change this to a log function to smoothly stop
-            # vel = math.exp(-MAX_DECEL * dist)
-            vel = math.sqrt(2 * MAX_DECEL * dist)
+            vel = math.exp(-MAX_DECEL * dist)
+            #vel = math.sqrt(2 * MAX_DECEL * dist)
             if vel < 1.0:
                 vel = 0
 
@@ -147,6 +147,7 @@ class WaypointUpdater(object):
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
+        # returns the waypoint which the car is supposed to stop at
         self.stopline_wp_idx = msg.data
 
     def obstacle_cb(self, msg):
