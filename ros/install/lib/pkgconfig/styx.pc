@@ -1,0 +1,8 @@
+prefix=/lhome/nasirmo/TeamCarla/ros/install
+
+Name: styx
+Description: Description of styx
+Version: 0.0.0
+Cflags: 
+Libs: -L/lhome/nasirmo/TeamCarla/ros/install/lib 
+Requires: 

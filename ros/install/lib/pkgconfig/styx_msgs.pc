@@ -1,0 +1,8 @@
+prefix=/lhome/nasirmo/TeamCarla/ros/install
+
+Name: styx_msgs
+Description: Description of styx_msgs
+Version: 0.0.0
+Cflags: -I/lhome/nasirmo/TeamCarla/ros/install/include
+Libs: -L/lhome/nasirmo/TeamCarla/ros/install/lib 
+Requires: 
