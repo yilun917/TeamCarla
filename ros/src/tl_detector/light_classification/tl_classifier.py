@@ -17,6 +17,10 @@ class TLClassifier(object):
         SSD_GRAPH_FILE = '../../../data/frozen_inference_graph.pb'
 
         self.detection_graph = self.load_graph(SSD_GRAPH_FILE)
+
+        # Add the growth opption to the config
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
         
         with self.detection_graph.as_default():
             with tf.Session(config=config, graph=self.detection_graph) as self.sess:
@@ -279,14 +283,8 @@ class TLClassifier(object):
     def find_objects(self, image, confidence_cutoff, detect_types):
         # Convert to numpy array for detection processing
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
-
-	    # Add the growth opption to the config
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
         
         # Process the image
-
-        # Actual detection.
         start_time = time.time()
         (boxes, scores, classes) = self.sess.run([self.detection_boxes, self.detection_scores, self.detection_classes], feed_dict={self.image_tensor: image_np})
         end_time_detect = time.time()
