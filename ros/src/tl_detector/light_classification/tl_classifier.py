@@ -277,41 +277,42 @@ class TLClassifier(object):
         # Convert to numpy array for detection processing
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
 
-	# Add the growth opption to the config
-	config = tf.ConfigProto()
-	config.gpu_options.allow_growth = True
+	    # Add the growth opption to the config
+	    config = tf.ConfigProto()
+	    config.gpu_options.allow_growth = True
 
         # Process the image
-        with tf.Session(config=config, graph=self.detection_graph) as sess:
-            # Actual detection.
-            start_time = time.time()
-            (boxes, scores, classes) = sess.run([self.detection_boxes, self.detection_scores, self.detection_classes],
-                                                feed_dict={self.image_tensor: image_np})
-            end_time = time.time()
-            print "tf classification time: ", end_time-start_time
+        with detection_graph.as_default():
+            with tf.Session(config=config, graph=self.detection_graph) as sess:
+                # Actual detection.
+                start_time = time.time()
+                (boxes, scores, classes) = sess.run([self.detection_boxes, self.detection_scores, self.detection_classes],
+                                                    feed_dict={self.image_tensor: image_np})
+                end_time = time.time()
+                print "tf classification time: ", end_time-start_time
 
-            # Remove unnecessary dimensions
-            boxes = np.squeeze(boxes)
-            scores = np.squeeze(scores)
-            classes = np.squeeze(classes)
+                # Remove unnecessary dimensions
+                boxes = np.squeeze(boxes)
+                scores = np.squeeze(scores)
+                classes = np.squeeze(classes)
 
-            # Filter boxes with a confidence score less than `confidence_cutoff`
-            boxes, scores, classes = self.filter_boxes(confidence_cutoff, detect_types, boxes, scores, classes)
+                # Filter boxes with a confidence score less than `confidence_cutoff`
+                boxes, scores, classes = self.filter_boxes(confidence_cutoff, detect_types, boxes, scores, classes)
 
-            # The current box coordinates are normalized to a range between 0 and 1.
-            # This converts the coordinates actual location on the image.
-            #width, height = image.size
-            #box_coords = to_image_coords(boxes, height, width)
-            size = image.shape
-            box_coords = self.to_image_coords(boxes, size[0], size[1])
+                # The current box coordinates are normalized to a range between 0 and 1.
+                # This converts the coordinates actual location on the image.
+                #width, height = image.size
+                #box_coords = to_image_coords(boxes, height, width)
+                size = image.shape
+                box_coords = self.to_image_coords(boxes, size[0], size[1])
 
-            found_objects = []
+                found_objects = []
 
-            # Loop through the bounding boxes, convert to a cropped image at the bounding box and add to the list to return
-            for i in range(len(box_coords)):
-                crop_img = image.copy()
-                crop_img = crop_img[int(box_coords[i][0]):int(box_coords[i][2]), int(box_coords[i][1]):int(box_coords[i][3])]
-                found_objects.append(crop_img)
+                # Loop through the bounding boxes, convert to a cropped image at the bounding box and add to the list to return
+                for i in range(len(box_coords)):
+                    crop_img = image.copy()
+                    crop_img = crop_img[int(box_coords[i][0]):int(box_coords[i][2]), int(box_coords[i][1]):int(box_coords[i][3])]
+                    found_objects.append(crop_img)
 
 
-            return found_objects
+                return found_objects
