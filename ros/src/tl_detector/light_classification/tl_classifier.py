@@ -277,8 +277,12 @@ class TLClassifier(object):
         # Convert to numpy array for detection processing
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
 
+	# Add the growth opption to the config
+	config = tf.ConfigProto()
+	config.gpu_options.allow_growth = True
+
         # Process the image
-        with tf.Session(graph=self.detection_graph) as sess:
+        with tf.Session(config=config, graph=self.detection_graph) as sess:
             # Actual detection.
             start_time = time.time()
             (boxes, scores, classes) = sess.run([self.detection_boxes, self.detection_scores, self.detection_classes],
