@@ -66,9 +66,9 @@ class TLClassifier(object):
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         #start_time = time.time()
         # Crop the image to our ROI - this will help filter out other lanes and the ground, also make image smaller for faster processing
-        crop_img = image.copy()
-        h = crop_img.shape[0]
-        w = crop_img.shape[1]
+        #crop_img = image.copy()
+        #h = crop_img.shape[0]
+        #w = crop_img.shape[1]
 
         # High center image
         #y = 0             # Adjust top start
@@ -77,13 +77,13 @@ class TLClassifier(object):
         #w = int(w * 0.55) # Adjust window width
 
         # Low center image
-        y = int(h * 0.30)  # Adjust top start
-        x = int(h * 0.25) # Adjust side to side start
-        h = int(h * 0.90) # Adjust window height
-        w = int(w * 0.65) # Adjust window width
+        #y = int(h * 0.30)  # Adjust top start
+        #x = int(h * 0.25) # Adjust side to side start
+        #h = int(h * 0.90) # Adjust window height
+        #w = int(w * 0.65) # Adjust window width
 
-        crop_img = image[y: y + h, x: x + w].copy()
-        lights = self.find_objects(crop_img, confidence_cutoff, detect_types)
+        #crop_img = image[y: y + h, x: x + w].copy()
+        lights = self.find_objects(image, confidence_cutoff, detect_types)
 
         labels = []
 
