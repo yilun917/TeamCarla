@@ -32,6 +32,9 @@ class TLClassifier(object):
         # The classification of the object (integer id).
         self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
 
+        with self.detection_graph.as_default():
+            with tf.Session(config=config, graph=self.detection_graph) as self.sess:
+
     """Determines the color of the traffic light in the image
         Args:
             image (cv::Mat): image containing the traffic light
@@ -271,48 +274,49 @@ class TLClassifier(object):
         confidence_cutoff (double): detection threshold
         detect_types (array): types of objects to detect
     Returns:
-        (graph): graph
+        (array): detected objects of specified type(s)
     """
     def find_objects(self, image, confidence_cutoff, detect_types):
         # Convert to numpy array for detection processing
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
 
 	    # Add the growth opption to the config
-	    config = tf.ConfigProto()
-	    config.gpu_options.allow_growth = True
-
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        
         # Process the image
-        with detection_graph.as_default():
-            with tf.Session(config=config, graph=self.detection_graph) as sess:
-                # Actual detection.
-                start_time = time.time()
-                (boxes, scores, classes) = sess.run([self.detection_boxes, self.detection_scores, self.detection_classes],
-                                                    feed_dict={self.image_tensor: image_np})
-                end_time = time.time()
-                print "tf classification time: ", end_time-start_time
 
-                # Remove unnecessary dimensions
-                boxes = np.squeeze(boxes)
-                scores = np.squeeze(scores)
-                classes = np.squeeze(classes)
+        # Actual detection.
+        start_time = time.time()
+        (boxes, scores, classes) = self.sess.run([self.detection_boxes, self.detection_scores, self.detection_classes], feed_dict={self.image_tensor: image_np})
+        end_time_detect = time.time()
+        print "tf detect time: ", end_time_detect-start_time
 
-                # Filter boxes with a confidence score less than `confidence_cutoff`
-                boxes, scores, classes = self.filter_boxes(confidence_cutoff, detect_types, boxes, scores, classes)
+        # Remove unnecessary dimensions
+        boxes = np.squeeze(boxes)
+        scores = np.squeeze(scores)
+        classes = np.squeeze(classes)
 
-                # The current box coordinates are normalized to a range between 0 and 1.
-                # This converts the coordinates actual location on the image.
-                #width, height = image.size
-                #box_coords = to_image_coords(boxes, height, width)
-                size = image.shape
-                box_coords = self.to_image_coords(boxes, size[0], size[1])
+        # Filter boxes with a confidence score less than `confidence_cutoff`
+        boxes, scores, classes = self.filter_boxes(confidence_cutoff, detect_types, boxes, scores, classes)
 
-                found_objects = []
+        # The current box coordinates are normalized to a range between 0 and 1.
+        # This converts the coordinates actual location on the image.
+        #width, height = image.size
+        #box_coords = to_image_coords(boxes, height, width)
+        size = image.shape
+        box_coords = self.to_image_coords(boxes, size[0], size[1])
 
-                # Loop through the bounding boxes, convert to a cropped image at the bounding box and add to the list to return
-                for i in range(len(box_coords)):
-                    crop_img = image.copy()
-                    crop_img = crop_img[int(box_coords[i][0]):int(box_coords[i][2]), int(box_coords[i][1]):int(box_coords[i][3])]
-                    found_objects.append(crop_img)
+        found_objects = []
 
+        # Loop through the bounding boxes, convert to a cropped image at the bounding box and add to the list to return
+        for i in range(len(box_coords)):
+            crop_img = image.copy()
+            crop_img = crop_img[int(box_coords[i][0]):int(box_coords[i][2]), int(box_coords[i][1]):int(box_coords[i][3])]
+            found_objects.append(crop_img)
 
-                return found_objects
+        end_time_classify = time.time()
+        print "tf classification time: ", end_time_classify-end_time_detect
+        print "tf TOTAL TIME: ", end_time_classify-start_time
+
+        return found_objects
