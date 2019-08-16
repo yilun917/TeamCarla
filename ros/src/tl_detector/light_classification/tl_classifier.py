@@ -31,10 +31,10 @@ class TLClassifier(object):
 
         # The classification of the object (integer id).
         self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
-
+        
         with self.detection_graph.as_default():
             with tf.Session(config=config, graph=self.detection_graph) as self.sess:
-
+                
     """Determines the color of the traffic light in the image
         Args:
             image (cv::Mat): image containing the traffic light
