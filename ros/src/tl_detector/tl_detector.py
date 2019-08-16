@@ -139,10 +139,11 @@ class TLDetector(object):
 
         #Get classification
         # Throttle the incoming requests
-        if self.light_classifier_throttle_time + rospy.Duration(1) < rospy.get_rostime():
+        if self.light_classifier_throttle_time + rospy.Duration(0.2) < rospy.get_rostime():
             #return light.state
             cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
             self.last_light_state = self.light_classifier.get_classification(cv_image)
+            self.light_classifier_throttle_time = rospy.get_rostime()
             return self.last_light_state
         else:
             return self.last_light_state
