@@ -298,10 +298,10 @@ class TLClassifier(object):
         image_np = np.expand_dims(np.asarray(image, dtype=np.uint8), 0)
         
         # Process the image
-        start_time = time.time()
+        #start_time = time.time()
         (boxes, scores, classes) = self.sess.run([self.detection_boxes, self.detection_scores, self.detection_classes], feed_dict={self.image_tensor: image_np})
-        end_time_detect = time.time()
-        print "tf detect time: ", end_time_detect-start_time
+        #end_time_detect = time.time()
+        #print "tf detect time: ", end_time_detect-start_time
 
         # Remove unnecessary dimensions
         boxes = np.squeeze(boxes)
@@ -327,7 +327,7 @@ class TLClassifier(object):
             found_objects.append(crop_img)
 
         end_time_classify = time.time()
-        print "tf classification time: ", end_time_classify-end_time_detect
-        print "tf TOTAL TIME: ", end_time_classify-start_time
+        #print "tf classification time: ", end_time_classify-end_time_detect
+        #print "tf TOTAL TIME: ", end_time_classify-start_time
 
         return found_objects
