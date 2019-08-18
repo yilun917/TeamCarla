@@ -46,11 +46,18 @@ class TLClassifier(object):
         self.sess = tf.Session(config=config, graph=self.detection_graph)
         self.sess.run(graph_init_op)
 
+        self.start_time = rospy.get_rostime()
+
     def __del__(self):
         # Close tf the session
         self.sess.close() 
         rospy.loginfo("tl_classifier::TF SESS CLOSED")
-               
+
+
+    """Returns start time of module
+    """
+    def get_start_time(self):
+        return self.start_time 
 
     """Determines the color of the traffic light in the image
         Args:

@@ -4,6 +4,7 @@ import rospy
 from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
+from light_classification.tl_classifier import TLClassifier
 import math
 
 from twist_controller import Controller
@@ -74,6 +75,8 @@ class DBWNode(object):
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
 
+        self.light_classifier = TLClassifier()
+
         self.loop()
 
     def dbw_enabled_cb(self, msg):
@@ -97,7 +100,10 @@ class DBWNode(object):
                                                                                    self.linear_vel,
                                                                                    self.angular_vel * 1.3)
             if self.dbw_enabled:
-                self.publish(self.throttle, self.brake, self.steering)
+                if  rospy.get_rostime() < self.light_classifier.get_start_time() + rospy.Duration(3.0) :
+                    self.publish(0, 750, 0)
+                else:
+                    self.publish(self.throttle, self.brake, self.steering)
 
             rate.sleep()
 
