@@ -20,13 +20,9 @@ class TimeTracker():
         if(self.first):
             self.check.data = False
             self.first = False
-
-    def loop(self):
-        rate = rospy.Rate(50)
-        while not rospy.is_shutdown():
             self.my_pub.publish(self.check)
             self.check.data = True
-            rate.sleep()
+
 
    
 
