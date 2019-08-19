@@ -10,12 +10,12 @@ ONE_MPH = 0.44704
 class Controller(object):
     def __init__(self, vehicle_mass, brake_deadband, decel_limit, accel_limit, wheel_radius, wheel_base, steer_ratio, max_lat_accel, max_steer_angle):
 
-        kp = 0.3 # Need to tune
-        ki = 0.0
-        kd = 1.5
+        kp = 0.3 #0.3  0.5 Need to tune
+        ki = 0.1 #0.1  0.1
+        kd = 0. #0.0  2.5
 
         mn = 0.0 # minimum throttle
-        mx = 0.2 # maximum throttle
+        mx = 0.23 # maximum throttle
         self.throttle_controller = PID(kp, ki, kd, mn, mx)
 
         tau = 0.5
@@ -52,7 +52,8 @@ class Controller(object):
 
         if linear_vel == 0.0 and current_vel < 0.1: # todo: jerk-minimizing brake application
             throttle = 0.0
-            brake = 400.0 #N.m
+            brake = 750.0 #N.m  was 400
+
         elif throttle < 0.1 and vel_error < 0:
             throttle = 0.0
             decel = max(vel_error, self.decel_limit)

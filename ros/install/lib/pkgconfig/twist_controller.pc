@@ -1,0 +1,8 @@
+prefix=/lhome/nasirmo/TeamCarla/ros/install
+
+Name: twist_controller
+Description: Description of twist_controller
+Version: 0.0.0
+Cflags: 
+Libs: -L/lhome/nasirmo/TeamCarla/ros/install/lib 
+Requires: 
