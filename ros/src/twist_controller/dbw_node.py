@@ -5,6 +5,7 @@ from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
 import math
+import time
 
 from twist_controller import Controller
 
@@ -66,15 +67,20 @@ class DBWNode(object):
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
-
+        # check if the classifier has just initilized
+        rospy.Subscriber("/time_track", Bool, self.time_cb)
         self.current_vel = None
         self.curr_ang_vel = None
         self.dbw_enabled = None
         self.linear_vel = None
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
+        self.start = False
 
         self.loop()
+
+    def time_cb(self, msg):
+        self.start = True
 
     def dbw_enabled_cb(self, msg):
         self.dbw_enabled = msg
@@ -97,7 +103,13 @@ class DBWNode(object):
                                                                                    self.linear_vel,
                                                                                    self.angular_vel * 1.3)
             if self.dbw_enabled:
-                self.publish(self.throttle, self.brake, self.steering)
+                if self.start:
+                    self.publish(0, 750, 0)
+                    time.sleep(3)
+                    self.start = False
+                    
+                else:
+                    self.publish(self.throttle, self.brake, self.steering)
 
             rate.sleep()
 
