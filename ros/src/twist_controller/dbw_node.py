@@ -75,12 +75,12 @@ class DBWNode(object):
         self.linear_vel = None
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
-        self.start = False
+        self.initilizing = False
 
         self.loop()
 
     def time_cb(self, msg):
-        self.start = True
+        self.initilizing = msg.data
 
     def dbw_enabled_cb(self, msg):
         self.dbw_enabled = msg
@@ -103,10 +103,10 @@ class DBWNode(object):
                                                                                    self.linear_vel,
                                                                                    self.angular_vel * 1.3)
             if self.dbw_enabled:
-                if self.start:
+                if self.initilizing:
                     self.publish(0, 750, 0)
                     time.sleep(3)
-                    self.start = False
+                    self.initilizing = False
                     
                 else:
                     self.publish(self.throttle, self.brake, self.steering)
