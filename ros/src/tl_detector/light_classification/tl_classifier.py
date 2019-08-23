@@ -10,9 +10,12 @@ from PIL import ImageColor
 import time
 from scipy.stats import norm
 from styx_msgs.msg import TrafficLight
+from std_msgs.msg import String
 
 class TLClassifier(object):
     def __init__(self):
+        self.tl_color_pub = rospy.Publisher("/tl_color", String, queue_size=1)
+
         # Frozen inference graph files. NOTE: change the path to where you saved the models.
         SSD_GRAPH_FILE = '../../../data/frozen_inference_graph.pb'
 
@@ -88,7 +91,8 @@ class TLClassifier(object):
         labels = []
 
         if len(lights) == 0:
-            rospy.loginfo("tl_classifier::No lights found")
+            #rospy.loginfo("tl_classifier::No lights found")
+            self.tl_color_pub.publish('NO LIGHTS TO CLASSIFY')
             return TrafficLight.UNKNOWN
 
         # Loop through the traffic light detections and add the detected colors to the llabels list
@@ -103,16 +107,20 @@ class TLClassifier(object):
 
         # Look through the list and return the most dangerous color found
         if 0 in labels:  # RED
-            rospy.loginfo("tl_classifier::Red light found")
+            #rospy.loginfo("tl_classifier::Red light found")
+            self.tl_color_pub.publish('RED')
             return TrafficLight.RED
         elif 1 in labels: # YELLOW
-            rospy.loginfo("tl_classifier::Yellow light found")
+            #rospy.loginfo("tl_classifier::Yellow light found")
+            self.tl_color_pub.publish('YELLOW')
             return TrafficLight.YELLOW
         elif 2 in labels: # GREEN
-            rospy.loginfo("tl_classifier::Green light found")
+            #rospy.loginfo("tl_classifier::Green light found")
+            self.tl_color_pub.publish('GREEN')
             return TrafficLight.GREEN
 
-        rospy.loginfo("tl_classifier::Light found - COLOR UNDETERMINED")
+        #rospy.loginfo("tl_classifier::Light found - COLOR UNDETERMINED")
+        self.tl_color_pub.publish('COLOR UNDETERMINED OF LIGHT')
         return TrafficLight.UNKNOWN
 
 

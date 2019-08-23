@@ -2,6 +2,7 @@
 
 import rospy
 from std_msgs.msg import Bool
+from sensor_msgs.msg import Image
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
 import math
@@ -69,18 +70,23 @@ class DBWNode(object):
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
         # check if the classifier has just initilized
         rospy.Subscriber("/time_track", Bool, self.time_cb)
+        rospy.Subscriber("/image_color", Image, self.camera_cb)
         self.current_vel = None
         self.curr_ang_vel = None
         self.dbw_enabled = None
         self.linear_vel = None
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
-        self.initilizing = False
+        self.traffic_cl_has_published = False
+        self.using_camera = False
 
         self.loop()
 
     def time_cb(self, msg):
-        self.initilizing = msg.data
+        self.traffic_cl_has_published = msg.data
+
+    def camera_cb(self, msg):
+        self.using_camera = True
 
     def dbw_enabled_cb(self, msg):
         self.dbw_enabled = msg
@@ -102,14 +108,13 @@ class DBWNode(object):
                                                                                    self.dbw_enabled,
                                                                                    self.linear_vel,
                                                                                    self.angular_vel * 1.3)
-            if self.dbw_enabled:
-                if self.initilizing:
-                    self.publish(0, 750, 0)
-                    time.sleep(3)
-                    self.initilizing = False
-                    
-                else:
-                    self.publish(self.throttle, self.brake, self.steering)
+
+            if self.dbw_enabled and self.using_camera == True and self.traffic_cl_has_published == True:
+                    self.publish(self.throttle, self.brake, self.steering)                  
+            elif self.dbw_enabled and self.using_camera == False:
+                self.publish(self.throttle, self.brake, self.steering)                  
+            else:
+                self.publish(0, 950, 0) 
 
             rate.sleep()
 
