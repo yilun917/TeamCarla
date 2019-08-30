@@ -101,7 +101,7 @@ Specific to these libraries, the simulator grader and Carla use the following:
 We are working on a fix to line up the OpenCV versions between the two.
 
 ### Feedback
-https://review-api.udacity.com/api/v1/submissions/1948456/archive
+https://udacity-selfdrivingcar.s3.amazonaws.com/reviews/1948456_1567034151.zip
 
 ### LISCENCE
 [MIT Liscence](./LICENSE)
