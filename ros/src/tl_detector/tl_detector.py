@@ -12,6 +12,9 @@ import cv2
 import yaml
 from scipy.spatial import KDTree
 import time
+from std_msgs.msg import String
+import numpy as np
+
 
 STATE_COUNT_THRESHOLD = 2
 
@@ -27,6 +30,8 @@ class TLDetector(object):
         self.has_image = False
         self.lights = []
         self.last_light_state = TrafficLight.UNKNOWN
+        self.immediate_light_state = TrafficLight.UNKNOWN
+        self.immediate_light_state_count = 0
         self.light_classifier_throttle_time = rospy.get_rostime()
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
@@ -43,6 +48,8 @@ class TLDetector(object):
         sub6 = rospy.Subscriber('/image_color', Image, self.image_cb, queue_size=1)
 
         self.test_pub = rospy.Publisher('/dummy_image', Image, queue_size=1)
+        self.light_pub = rospy.Publisher('/tl_filtered', String, queue_size=1)
+
 
         config_string = rospy.get_param("/traffic_light_config")
         # config also contains an "is_site" bool variable to check if the car is running in simulator or site
@@ -52,6 +59,7 @@ class TLDetector(object):
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
+        self.light_classifier.find_objects(np.zeros((2,2,3), np.uint8), 0.5, [10.]) # Hit the classifier to get TF through its init
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -139,14 +147,32 @@ class TLDetector(object):
 
         #Get classification
         # Throttle the incoming requests
-        if self.light_classifier_throttle_time + rospy.Duration(0.2) < rospy.get_rostime():
-            #return light.state
-            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-            self.last_light_state = self.light_classifier.get_classification(cv_image)
-            self.light_classifier_throttle_time = rospy.get_rostime()
-            return self.last_light_state
-        else:
-            return self.last_light_state
+        #if self.light_classifier_throttle_time + rospy.Duration(0.05) < rospy.get_rostime():
+            #cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+            #self.last_light_state = self.light_classifier.get_classification(cv_image)
+            #self.light_classifier_throttle_time = rospy.get_rostime()
+            #return self.last_light_state
+
+
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        self.immediate_light_state = self.light_classifier.get_classification(cv_image)
+        self.light_classifier_throttle_time = rospy.get_rostime()
+
+        # Filter out noise from the classifier
+        if (self.immediate_light_state != self.last_light_state):
+            self.immediate_light_state_count += 1
+            if (self.immediate_light_state_count > 8):
+                if (self.last_light_state == 1 and self.immediate_light_state != 0):
+                    self.last_light_state =  self.last_light_state
+                else:
+                    self.last_light_state = self.immediate_light_state
+                self.immediate_light_state_count = 0
+
+        self.light_pub.publish(str(self.last_light_state))
+        return self.last_light_state
+
+        #else:
+        #    return self.last_light_state
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its

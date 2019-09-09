@@ -36,8 +36,9 @@ class TLClassifier(object):
         self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
 
         # Add the growth opption to the config
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
+        config = tf.ConfigProto(gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.75))
+        #config.gpu_options.allow_growth = True
+        #config.gpu_options.per_process_gpu_memory_fraction = 0.90
 
         with self.detection_graph.as_default() as graph:
             graph_init_op = tf.global_variables_initializer()
@@ -63,7 +64,7 @@ class TLClassifier(object):
     """
     def get_classification(self, image):
 
-        confidence_cutoff = 0.6
+        confidence_cutoff = 0.5
         detect_types = [10.]
 
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -154,8 +155,12 @@ class TLClassifier(object):
         bottom_hsv = cv2.cvtColor(bottom, cv2.COLOR_RGB2HSV)
 
         # Mask for Red
+        #lower_red_1 = np.array([5,5,150])
+        #upper_red_1 = np.array([12,255,255])
+        #lower_red_2 = np.array([150,28,120])
+        #upper_red_2 = np.array([179,255,255])
         lower_red_1 = np.array([5,5,150])
-        upper_red_1 = np.array([12,255,255])
+        upper_red_1 = np.array([25,255,255])
         lower_red_2 = np.array([150,28,120])
         upper_red_2 = np.array([179,255,255])
         top_mask_1 = cv2.inRange(top_hsv, lower_red_1, upper_red_1)
