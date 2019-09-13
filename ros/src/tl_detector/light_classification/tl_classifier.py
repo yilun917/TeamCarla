@@ -64,7 +64,7 @@ class TLClassifier(object):
     """
     def get_classification(self, image):
 
-        confidence_cutoff = 0.5
+        confidence_cutoff = 0.28
         detect_types = [10.]
 
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -147,11 +147,11 @@ class TLClassifier(object):
     """
     def create_feature(self, rgb_image):
         # Crop and split the image into three sections
-        top = rgb_image[2:10 , 4:26, :].copy()
+        top = rgb_image[3:9 , 4:26, :].copy()
         top_hsv = cv2.cvtColor(top, cv2.COLOR_RGB2HSV)
-        middle = rgb_image[11:19 , 4:26, :].copy()
+        middle = rgb_image[14:19 , 4:26, :].copy()
         middle_hsv = cv2.cvtColor(middle, cv2.COLOR_RGB2HSV)
-        bottom = rgb_image[20:29 , 4:26, :].copy()
+        bottom = rgb_image[24:29 , 4:26, :].copy()
         bottom_hsv = cv2.cvtColor(bottom, cv2.COLOR_RGB2HSV)
 
         # Mask for Red
