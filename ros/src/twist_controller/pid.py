@@ -10,6 +10,7 @@ class PID(object):
         self.kd = kd
         self.min = mn
         self.max = mx
+        self.cur_scale_step = 0
 
         self.int_val = self.last_error = 0.0
 
@@ -18,10 +19,13 @@ class PID(object):
 
     def step(self, error, sample_time):
 
-        integral = self.int_val + error * sample_time;
-        derivative = (error - self.last_error) / sample_time;
+        if self.last_error < 0.0001:
+            self.last_error = error
 
-        val = self.kp * error + self.ki * integral + self.kd * derivative;
+        integral = self.int_val + error * sample_time
+        derivative = (error - self.last_error) / sample_time
+
+        val = self.kp * error + self.ki * integral + self.kd # * derivative
 
         if val > self.max:
             val = self.max
@@ -32,3 +36,7 @@ class PID(object):
         self.last_error = error
 
         return val
+
+    # kp = 0.001 #0.3  0.5 Need to tune
+    # ki = 0.01 #0.1  0.1
+    # kd = 0.0 #0.0  2.5

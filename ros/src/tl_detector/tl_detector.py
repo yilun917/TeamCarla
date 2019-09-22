@@ -161,11 +161,11 @@ class TLDetector(object):
         # Filter out noise from the classifier
         if (self.immediate_light_state != self.last_light_state):
             self.immediate_light_state_count += 1
-            if (self.immediate_light_state_count > 6):
-                if (self.last_light_state == 1 and self.immediate_light_state != 0):
-                    self.last_light_state =  self.last_light_state
-                else:
-                    self.last_light_state = self.immediate_light_state
+            if (self.immediate_light_state_count > 4):
+                #if (self.last_light_state == 1 and self.immediate_light_state != 0):
+                #    self.last_light_state =  self.last_light_state
+                #else:
+                self.last_light_state = self.immediate_light_state
                 self.immediate_light_state_count = 0
 
         self.light_pub.publish(str(self.last_light_state))

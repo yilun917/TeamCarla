@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 from sensor_msgs.msg import Image
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
@@ -68,17 +68,19 @@ class DBWNode(object):
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
         rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
         rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
+        rospy.Subscriber('/tl_filtered', String, self.tl_cb)
         # check if the classifier has just initilized
         rospy.Subscriber("/time_track", Bool, self.time_cb)
         rospy.Subscriber("/image_color", Image, self.camera_cb)
         self.current_vel = None
         self.curr_ang_vel = None
-        self.dbw_enabled = None
+        self.dbw_enabled = False
         self.linear_vel = None
         self.angular_vel = None
         self.throttle = self.steering = self.brake = 0
         self.traffic_cl_has_published = False
         self.using_camera = False
+        self.current_tl_color = 4
 
         self.loop()
 
@@ -89,7 +91,7 @@ class DBWNode(object):
         self.using_camera = True
 
     def dbw_enabled_cb(self, msg):
-        self.dbw_enabled = msg
+        self.dbw_enabled = msg.data
 
     def twist_cb(self, msg):
         self.linear_vel = msg.twist.linear.x
@@ -98,19 +100,43 @@ class DBWNode(object):
     def velocity_cb(self, msg):
         self.current_vel = msg.twist.linear.x
 
+    def tl_cb(self, msg):
+        self.current_tl_color = msg.data
+
     def loop(self):
         rate = rospy.Rate(50) # 50Hz
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabledz
             if not None in (self.current_vel, self.linear_vel, self.angular_vel):
+
+
+                # Make steering angle inversely proportional to speed of vehicle
+                if self.angular_vel > 0:
+                    self.angular_vel = (self.angular_vel * 9) / self.current_vel
+
                 self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
                                                                                    self.dbw_enabled,
                                                                                    self.linear_vel,
-                                                                                   self.angular_vel * 1.3)
+                                                                                   self.angular_vel)
+
+
+                # If red light ahead get off the throttle so the brakes can be applied!!!
+                if self.current_tl_color == "0" and self.linear_vel < 3.0:
+                    self.throttle = 0
+
+                # Slow the vehicle when working through a tight corner
+                if self.steering > 2.0:
+                    self.throttle = self.throttle * .90
+                if self.steering > 3.0:
+                    self.throttle = self.throttle * .80
+                if self.steering > 4.0:
+                    self.throttle = self.throttle * .70
+                if self.steering > 5.0:
+                    self.throttle = self.throttle * .60
 
             if self.dbw_enabled and self.using_camera == True and self.traffic_cl_has_published == True:
-                    self.publish(self.throttle, self.brake, self.steering)                  
+                self.publish(self.throttle, self.brake, self.steering)                  
             elif self.dbw_enabled and self.using_camera == False:
                 self.publish(self.throttle, self.brake, self.steering)                  
             else:
