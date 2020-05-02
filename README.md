@@ -77,7 +77,7 @@ unzip traffic_light_bag_file.zip
 ```bash
 rosbag play -l traffic_light_bag_file/traffic_light_training.bag
 ```
-4. Launch your project in site mode
+4. Launch our project in site mode
 ```bash
 cd CarND-Capstone/ros
 roslaunch launch/site.launch
